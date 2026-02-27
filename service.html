@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNLX Dev - Layanan Unlock & Flash Profesional</title>
+    <style>
+        :root {
+            --primary: #00dbde;
+            --secondary: #fc00ff;
+            --dark: #0f0f1a;
+            --light: #ffffff;
+            --gray: rgba(255, 255, 255, 0.1);
+            --success: #0f0;
+            --danger: #f00;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            min-height: 100vh;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            mix-blend-mode: difference;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease;
+        }
+
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) translateX(200px);
+                opacity: 0;
+            }
+        }
+
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+            background: rgba(15, 15, 26, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 3vw, 1.8rem);
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 101;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: clamp(1rem, 3vw, 2rem);
+        }
+
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+            font-size: clamp(0.9rem, 1.1vw, 1rem);
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem clamp(1rem, 3vw, 2rem);
+            position: relative;
+            z-index: 10;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 3vw, 1.8rem);
+            margin: 1.5rem 0 1rem;
+            color: var(--primary);
+        }
+
+        p {
+            font-size: clamp(0.9rem, 1.1vw, 1rem);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Product Cards */
+        .tool-category {
+            margin-bottom: 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: clamp(1rem, 2vw, 1.5rem);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+        }
+
+        .tool-info {
+            flex: 1;
+        }
+
+        .pricing-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .price-card {
+            background: rgba(0, 219, 222, 0.1);
+            border: 1px solid rgba(0, 219, 222, 0.3);
+            padding: clamp(1rem, 1.5vw, 1.5rem);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .price-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 219, 222, 0.2);
+            background: rgba(0, 219, 222, 0.15);
+        }
+
+        .price-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .price-card .price {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--light);
+        }
+
+        .buy-btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .buy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 219, 222, 0.4);
+        }
+
+        /* Social Media */
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            color: var(--light);
+        }
+
+        .social-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .social-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .social-card h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .social-card p {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0;
+        }
+
+        /* Server Info */
+        .server-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .server-table th, .server-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .server-table th {
+            background: rgba(0, 219, 222, 0.2);
+            color: var(--primary);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status.online {
+            background: rgba(0, 255, 0, 0.2);
+            color: var(--success);
+        }
+
+        .status.offline {
+            background: rgba(255, 0, 0, 0.2);
+            color: var(--danger);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            
+            nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background: rgba(15, 15, 26, 0.95);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: right 0.3s ease;
+                z-index: 100;
+            }
+            
+            nav.active {
+                right: 0;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 2rem;
+            }
+            
+            .tool-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .tool-image {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .social-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pricing-table {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Particles Animation -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header & Navigation -->
+    <header>
+        <div class="logo">UNLX DEV</div>
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav id="mainNav">
+            <ul>
+                <li><a href="#" class="nav-link active" data-section="layanan">Layanan Activasi</a></li>
+                <!-- <li><a href="#" class="nav-link" data-section="Bypass">Layanan Bypass</a></li> -->
+                <li><a href="#" class="nav-link" data-section="Imei">Layanan Pairing IMEI</a></li>
+                <li><a href="#" class="nav-link" data-section="sewa">Sewa Tool</a></li>
+                <li><a href="#" class="nav-link" data-section="sosial">Sosial Media</a></li>
+                <li><a href="#" class="nav-link" data-section="server">Info Server</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Products Section -->
+        <section id="layanan" class="section active">
+            <h1>Layanan Produk Kami</h1>
+            <p>Berbagai tool berkualitas tinggi untuk memenuhi kebutuhan unlock dan flashing perangkat Anda.</p>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgtiyAxsXgTm9RJmpe9gl1Ir7Uk_nynWSp0UWHxbeidPTZjKuaIzWYJWD_TKM-93o69C3F1ssWeBXcuCPmU6n2Dm8A0LWQ_PQUMxNvS7SN0rJaFVDPipQLD5QdOw-uhKdDG52Bem98E-XURkl9HPrKrc5H3DWaG_VBEt51I8Ogm9uC5XOYdg9pKh6LL/s865/logo_box.png" alt="UnlockTool" class="tool-image">
+                    <div class="tool-info">
+                        <h2>UnlockTool</h2>
+                        <p>Tool profesional untuk unlock berbagai perangkat Android dengan dukungan merek terlengkap.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>3 Bulan</h3>
+                        <div class="price">Rp 360.000</div>
+                        <button class="buy-btn" data-tool="UnlockTool" data-duration="3 Bulan" data-price="360000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>6 Bulan</h3>
+                        <div class="price">Rp 490.000</div>
+                        <button class="buy-btn" data-tool="UnlockTool" data-duration="6 Bulan" data-price="490000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Bulan</h3>
+                        <div class="price">Rp 780.000</div>
+                        <button class="buy-btn" data-tool="UnlockTool" data-duration="12 Bulan" data-price="780000">Beli Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiYHHJ5UaELcgzeyeCtJEcmh-O93GSNP8LJvLTBkXX078V9G8RBpEoCODwL_ONyhE_XmcnIkBaOYfNShuADU0qrvnhGrX08OuTLd53cq-mjELC2KRNOmh377AzspOHX7GXFzBvBXi3XZNOrpZOar8nMPZzncPYH7wlBz8nGHCdZg1-ZFTVS4BFpnPIM/s16000/cftool.jpeg" alt="CF Tool" class="tool-image">
+                    <div class="tool-info">
+                        <h2>CF Tool</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>1 Bulan</h3>
+                        <div class="price">Rp 100.000</div>
+                        <button class="buy-btn" data-tool="CF Tool" data-duration="1 Bulan" data-price="100000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>3 Bulan</h3>
+                        <div class="price">Rp 200.000</div>
+                        <button class="buy-btn" data-tool="CF Tool" data-duration="3 Bulan" data-price="200000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>6 Bulan</h3>
+                        <div class="price">Rp 320.000</div>
+                        <button class="buy-btn" data-tool="CF Tool" data-duration="6 Bulan" data-price="320000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Bulan</h3>
+                        <div class="price">Rp 440.000</div>
+                        <button class="buy-btn" data-tool="CF Tool" data-duration="12 Bulan" data-price="440000">Beli Sekarang</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://image.torob.com/base/images/Kj/p7/Kjp7OB8p5IutIKOU.jpg_/560x560.webp" alt="Borneo Schematic" class="tool-image">
+                    <div class="tool-info">
+                        <h2>Borneo Schematic</h2>
+                        <p>Schematic profesional untuk Hardware berbagai perangkat Android dengan dukungan merek terlengkap.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>3 Bulan</h3>
+                        <div class="price">Rp 250.000</div>
+                        <button class="buy-btn" data-tool="Borneo Schematic" data-duration="3 Bulan" data-price="250000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>3 Bulan 2PC</h3>
+                        <div class="price">Rp 385.000</div>
+                        <button class="buy-btn" data-tool="Borneo Schematic" data-duration="3 Bulan 2PC" data-price="385000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>6 Bulan</h3>
+                        <div class="price">Rp 350.000</div>
+                        <button class="buy-btn" data-tool="Borneo Schematic" data-duration="6 Bulan" data-price="350000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>6 Bulan 2PC</h3>
+                        <div class="price">Rp 600.000</div>
+                        <button class="buy-btn" data-tool="Borneo Schematic" data-duration="6 Bulan 2PC" data-price="600000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Bulan</h3>
+                        <div class="price">Rp 600.000</div>
+                        <button class="buy-btn" data-tool="Borneo Schematic" data-duration="12 Bulan" data-price="600000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Bulan 2PC</h3>
+                        <div class="price">Rp 850.000</div>
+                        <button class="buy-btn" data-tool="Borneo Schematic" data-duration="12 Bulan 2PC" data-price="850000">Beli Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://tse4.mm.bing.net/th/id/OIP.xF9EzMCwrR16b3fGXESpPQHaHa?pid=Api&P=0&h=220" alt="Pragmafix Schematic" class="tool-image">
+                    <div class="tool-info">
+                        <h2>Pragmafix Schematic</h2>
+                        <p>Schematic profesional untuk Hardware berbagai perangkat Android dengan dukungan merek terlengkap.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>3 Bulan</h3>
+                        <div class="price">Rp 125.000</div>
+                        <button class="buy-btn" data-tool="Pragmafix Schematic" data-duration="3 Bulan" data-price="125000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>6 Bulan</h3>
+                        <div class="price">Rp 225.000</div>
+                        <button class="buy-btn" data-tool="Pragmafix Schematic" data-duration="6 Bulan" data-price="225000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Bulan</h3>
+                        <div class="price">Rp 350.000</div>
+                        <button class="buy-btn" data-tool="Pragmafix Schematic" data-duration="12 Bulan" data-price="350000">Beli Sekarang</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://orion.estechschematics.com/assets/orion-logo.png" alt="Orion Schematic" class="tool-image">
+                    <div class="tool-info">
+                        <h2>Orion Schematic</h2>
+                        <p>Schematic profesional untuk Hardware berbagai perangkat Android dengan dukungan merek terlengkap.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>1 Bulan</h3>
+                        <div class="price">Rp 50.000</div>
+                        <button class="buy-btn" data-tool="Orion Schematic" data-duration="1 Bulan" data-price="50000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>3 Bulan</h3>
+                        <div class="price">Rp 100.000</div>
+                        <button class="buy-btn" data-tool="Orion Schematic" data-duration="3 Bulan" data-price="100000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>6 Bulan</h3>
+                        <div class="price">Rp 200.000</div>
+                        <button class="buy-btn" data-tool="Orion Schematic" data-duration="6 Bulan" data-price="200000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Bulan</h3>
+                        <div class="price">Rp 370.000</div>
+                        <button class="buy-btn" data-tool="Orion Schematic" data-duration="12 Bulan" data-price="370000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Bulan 2PC</h3>
+                        <div class="price">Rp 600.000</div>
+                        <button class="buy-btn" data-tool="Orion Schematic" data-duration="12 Bulan 2PC" data-price="600000">Beli Sekarang</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://www.dftprotool.com/wp-content/uploads/2021/06/DFT-PRO.jpg" alt="DFT Tool" class="tool-image">
+                    <div class="tool-info">
+                        <h2>DFT Tool</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>12 Bulan</h3>
+                        <div class="price">Rp 1.350.000</div>
+                        <button class="buy-btn" data-tool="DFT Tool" data-duration="12 Bulan" data-price="1350000">Beli Sekarang</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Bypass Section -->
+        <section id="Bypass" class="section">
+            <h1>Layanan Bypass</h1>
+            <p>Pilih Bypass yang ingin Anda Beli dan nikmati layanan terbaik kami dengan harga kompetitif.</p>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfencmyFM8EFxGLiGxD_CYRoIAJbGDZ1v_z0U-PVpPx3WRKaAx9ff40Cui&s=10" alt="Iremovalpro 5.0" class="tool-image">
+                    <div class="tool-info">
+                        <h2>Bypass A12+ Wifi Only</h2>
+                        <p>Tool profesional untuk unlock berbagai perangkat IOS dengan dukungan terlengkap.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>Tanpa Ragisn SN</h3>
+                        <div class="price">Rp 100.000</div>
+                        <button class="buy-btn" data-tool="Bypass Wifi A12+" data-duration="Tanpa Regisn SN" data-price="100000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>Tool Bypass Server 1</h3>
+                        <div class="price">Rp 150.000</div>
+                        <button class="buy-btn" data-tool="Bypass Wifi A12+" data-duration="Tool Bypass Server 1" data-price="150000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>Tool Bypass Server 2</h3>
+                        <div class="price">Rp 15.000</div>
+                        <button class="buy-btn" data-tool="Bypass Wifi A12+" data-duration="Tool Bypass Server 2" data-price="200000">Sewa Sekarang</button>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+            
+        <!-- IMEI Section -->
+        <section id="Imei" class="section">
+            <h1>Layanan Pairing IMEI</h1>
+            <p>Pilih 1Bulan/3Bulan yang ingin Anda Beli dan nikmati layanan terbaik kami dengan harga kompetitif.</p>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://play-lh.googleusercontent.com/7RyQmS6GG7S962X35wnhlXeJWF25bocYhnCP2lRMDMA2vrJWXrwIR9SK-OAPJeXZaOU=w240-h480-rw" alt="Unblock IMEI" class="tool-image">
+                    <div class="tool-info">
+                        <h2>Unblock IMEI</h2>
+                        <p>Tool profesional untuk unlock berbagai perangkat IOS dengan dukungan terlengkap.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>1 Bulan</h3>
+                        <div class="price">Rp 180.000</div>
+                        <button class="buy-btn" data-tool="Unblock IMEI" data-duration="1 Bulan" data-price="180000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>3 Bulan Fast (10-30 Menit)</h3>
+                        <div class="price">Rp 200.000</div>
+                        <button class="buy-btn" data-tool="Unblock IMEI" data-duration="3 Bulan Fast" data-price="200000">Beli Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>3 Bulan Slow (1-12 Jam)</h3>
+                        <div class="price">Rp 150.000</div>
+                        <button class="buy-btn" data-tool="Unblock IMEI" data-duration="3 Bulan Fast" data-price="150000">Beli Sekarang</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+            
+        <!-- Rental Section -->
+        <section id="sewa" class="section">
+            <h1>Sewa Tool</h1>
+            <p>Pilih tool yang ingin Anda sewa dan nikmati layanan terbaik kami dengan harga kompetitif.</p>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgtiyAxsXgTm9RJmpe9gl1Ir7Uk_nynWSp0UWHxbeidPTZjKuaIzWYJWD_TKM-93o69C3F1ssWeBXcuCPmU6n2Dm8A0LWQ_PQUMxNvS7SN0rJaFVDPipQLD5QdOw-uhKdDG52Bem98E-XURkl9HPrKrc5H3DWaG_VBEt51I8Ogm9uC5XOYdg9pKh6LL/s865/logo_box.png" alt="UnlockTool" class="tool-image">
+                    <div class="tool-info">
+                        <h2>UnlockTool</h2>
+                        <p>Tool profesional untuk unlock berbagai perangkat Android dengan dukungan merek terlengkap.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>3 Jam</h3>
+                        <div class="price">Rp 8.000</div>
+                        <button class="buy-btn" data-tool="UnlockTool" data-duration="3 Jam" data-price="8000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>6 Jam</h3>
+                        <div class="price">Rp 10.000</div>
+                        <button class="buy-btn" data-tool="UnlockTool" data-duration="6 Jam" data-price="10000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Jam</h3>
+                        <div class="price">Rp 15.000</div>
+                        <button class="buy-btn" data-tool="UnlockTool" data-duration="12 Jam" data-price="15000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>24 Jam</h3>
+                        <div class="price">Rp 24.000</div>
+                        <button class="buy-btn" data-tool="UnlockTool" data-duration="24 Jam" data-price="24000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvOh388f1CkLN4H_t-fsJgi8XQmw9lMXdWlQ4SunVeuWr-jA7SDBHKz6Y&s=10" alt="Sigma Plus (Dongle)" class="tool-image">
+                    <div class="tool-info">
+                        <h2>Sigma Plus (Dongle)</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>3 Jam</h3>
+                        <div class="price">Rp 150.000</div>
+                        <button class="buy-btn" data-tool="Sigma Plus (Dongle)" data-duration="3 Jam" data-price="150000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://down-id.img.susercontent.com/file/id-11134207-7ra0j-mcjt99fbas0z36_tn.webp" alt="SamsTool" class="tool-image">
+                    <div class="tool-info">
+                        <h2>SamsTool</h2>
+                        <p>Tool profesional untuk unlock berbagai perangkat Android dengan dukungan merek Samsung.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>24 Jam</h3>
+                        <div class="price">Rp 220.000</div>
+                        <button class="buy-btn" data-tool="SamsTool" data-duration="24 Jam" data-price="220000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRn0NJbM7K1tzqvAmwf4XvP3DAP1NSKMzE9VW2S4MKY7176CWkX2KiXVPA&s=10" alt="Z3X Samsung Tool Pro" class="tool-image">
+                    <div class="tool-info">
+                        <h2>Z3X Samsung Tool Pro</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>1 Jam</h3>
+                        <div class="price">Rp 90.000</div>
+                        <button class="buy-btn" data-tool="Z3X Samsung Tool Pro" data-duration="1 Jam" data-price="90000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>2 Jam</h3>
+                        <div class="price">Rp 100.000</div>
+                        <button class="buy-btn" data-tool="Z3X Samsung Tool Pro" data-duration="2 Jam" data-price="100000">Sewa Sekarang</button>
+                    </div>
+                    </div>
+                    <div class="price-card">
+                        <h3>3 Jam</h3>
+                        <div class="price">Rp 120.000</div>
+                        <button class="buy-btn" data-tool="Z3X Samsung Tool Pro" data-duration="3 Jam" data-price="120000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+      
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTn5SlTZiaOsP01WYaUxzoqeeuI4pbac7UV_RufTSj_Cx-hUoVrpG0peKxU&s=10" alt="CFTOOL" class="tool-image">
+                    <div class="tool-info">
+                        <h2>CFTOOL</h2>
+                        <p>Tool profesional untuk unlock berbagai perangkat Android dengan dukungan merek terlengkap.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>3 Jam</h3>
+                        <div class="price">Rp 9.000</div>
+                        <button class="buy-btn" data-tool="CFTOOL" data-duration="3 Jam" data-price="9000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Jam</h3>
+                        <div class="price">Rp 20.000</div>
+                        <button class="buy-btn" data-tool="CFTOOL" data-duration="12 Jam" data-price="20000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>24 Jam</h3>
+                        <div class="price">Rp 25.000</div>
+                        <button class="buy-btn" data-tool="CFTOOL" data-duration="24 Jam" data-price="25000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf1wS5LMnt7O840UpF_NWVJu_BEsPzLyTBTQ&s" alt="TSM TOOL" class="tool-image">
+                    <div class="tool-info">
+                        <h2>TSM TOOL</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>6 Jam</h3>
+                        <div class="price">Rp 25.000</div>
+                        <button class="buy-btn" data-tool="TSM TOOL" data-duration="6 Jam" data-price="25000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Jam</h3>
+                        <div class="price">Rp 35.000</div>
+                        <button class="buy-btn" data-tool="TSM TOOL" data-duration="12 Jam" data-price="35000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFD_lAbihdJaSeQGa6uIJPSD9yQQbhWOmRLig9pPF40bxNEu2d7xse64U&s=10" alt="DFTpro" class="tool-image">
+                    <div class="tool-info">
+                        <h2>DFTpro</h2>
+                        <p>Tool profesional untuk unlock berbagai perangkat Android dengan dukungan merek terlengkap.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>24 Jam</h3>
+                        <div class="price">Rp 75.000</div>
+                        <button class="buy-btn" data-tool="DFTpro" data-duration="24 Jam" data-price="75000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>48 Jam</h3>
+                        <div class="price">Rp 100.000</div>
+                        <button class="buy-btn" data-tool="DFTpro" data-duration="48 Jam" data-price="100000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3dqV7JMlUjCCsM2V4uvRTKu4oX_uFW7PoDwlcQwX_qcqL4TphpU18g21y&s=10" alt="AMT" class="tool-image">
+                    <div class="tool-info">
+                        <h2>AMT</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>3 Jam</h3>
+                        <div class="price">Rp 10.000</div>
+                        <button class="buy-btn" data-tool="AMT" data-duration="3 Jam" data-price="10000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Jam</h3>
+                        <div class="price">Rp 20.000</div>
+                        <button class="buy-btn" data-tool="AMT" data-duration="12 Jam" data-price="20000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>24 Jam</h3>
+                        <div class="price">Rp 25.000</div>
+                        <button class="buy-btn" data-tool="AMT" data-duration="24 Jam" data-price="25000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTo9sF2an3ZpLoGefECowhDoHm7G_t1DHuCdrRjVUb58LXvRHyPoJoNTCoQ&s=10" alt="MDMFIX TOOL" class="tool-image">
+                    <div class="tool-info">
+                        <h2>MDMFIX TOOL</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>6 Jam</h3>
+                        <div class="price">Rp 60.000</div>
+                        <button class="buy-btn" data-tool="MDMFIX TOOL" data-duration="6 Jam" data-price="60000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>12 Jam</h3>
+                        <div class="price">Rp 100.000</div>
+                        <button class="buy-btn" data-tool="MDMFIX TOOL" data-duration="12 Jam" data-price="100000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6QapGznYIKUdDocu37lF_yB1cxmCtv5kX2y86Mp9PNoRb7DlybyUkUajv&s=10" alt="RTC TOOL" class="tool-image">
+                    <div class="tool-info">
+                        <h2>RTC TOOL</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>6 Jam</h3>
+                        <div class="price">Rp 70.000</div>
+                        <button class="buy-btn" data-tool="RTC TOOL" data-duration="6 Jam" data-price="70000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpPmwZwVTBjPZPScQ5sw_4ARyY-AXdmSZmnDy931fVz8FAQAAlTAY5rVDp&s=10" alt="UMT PRO" class="tool-image">
+                    <div class="tool-info">
+                        <h2>UMT PRO</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>3 Jam</h3>
+                        <div class="price">Rp 70.000</div>
+                        <button class="buy-btn" data-tool="UMT PRO" data-duration="3 Jam" data-price="70000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>6 Jam</h3>
+                        <div class="price">Rp 100.000</div>
+                        <button class="buy-btn" data-tool="UMT PRO" data-duration="6 Jam" data-price="100000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkgP5do-R7GKRHi70JvpOZVSc1BPpXqEDC7jg0F--xOze71puxbQE02Jw&s=10" alt="HYDRA TOOL" class="tool-image">
+                    <div class="tool-info">
+                        <h2>HYDRA TOOL</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>24 Jam</h3>
+                        <div class="price">Rp 80.000</div>
+                        <button class="buy-btn" data-tool="HYDRA TOOL" data-duration="24 Jam" data-price="80000">Sewa Sekarang</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="tool-header">
+                    <img src="https://down-id.img.susercontent.com/file/id-11134201-7qukw-leq7syvua21b43_tn.webp" alt="EFT PRO" class="tool-image">
+                    <div class="tool-info">
+                        <h2>EFT PRO</h2>
+                        <p>Solusi flashing dan repair berbagai perangkat dengan fitur lengkap dan mudah digunakan.</p>
+                    </div>
+                </div>
+                
+                <div class="pricing-table">
+                    <div class="price-card">
+                        <h3>3 Jam</h3>
+                        <div class="price">Rp 70.000</div>
+                        <button class="buy-btn" data-tool="EFT PRO" data-duration="3 Jam" data-price="70000">Sewa Sekarang</button>
+                    </div>
+                    <div class="price-card">
+                        <h3>6 Jam</h3>
+                        <div class="price">Rp 100.000</div>
+                        <button class="buy-btn" data-tool="EFT PRO" data-duration="6 Jam" data-price="100000">Sewa Sekarang</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Media Section -->
+        <section id="sosial" class="section">
+            <h1>Sosial Media Kami</h1>
+            <p>Ikuti kami di berbagai platform untuk mendapatkan informasi terbaru dan promo spesial.</p>
+            
+            <div class="social-grid">
+                <a href="https://www.facebook.com/rendikaaz" target="_blank" class="social-card">
+                    <div class="social-icon"><i class="fab fa-facebook"></i></div>
+                    <h3>Facebook</h3>
+                    <p>AJI</p>
+                </a>
+                <a href="https://wa.me/6283180892322" target="_blank" class="social-card">
+                    <div class="social-icon"><i class="fab fa-whatsapp"></i></div>
+                    <h3>WhatsApp</h3>
+                    <p>+6283180892322</p>
+                </a>
+                <a href="https://whatsapp.com/channel/0029VbAjfqP0Qeak27GI9B1E" target="_blank" class="social-card">
+                    <div class="social-icon"><i class="fab fa-whatsapp"></i></div>
+                    <h3>Whatsapp Chanel</h3>
+                    <p>UNLX</p> 
+                </a>
+                <a href="https://t.me/ibypasslpg" target="_blank" class="social-card">
+                    <div class="social-icon"><i class="fab fa-telegram"></i></div>
+                    <h3>Telegram</h3>
+                    <p>@ibypasslpg</p>
+                </a>
+               
+                <a href="https://www.tiktok.com/ibypasslpg" target="_blank" class="social-card">
+                    <div class="social-icon"><i class="fab fa-tiktok"></i></div>
+                    <h3>TikTok</h3>
+                    <p>@ibypasslpg</p>
+                </a>
+                <a href="https://www.instagram.com/ibypasslpg" target="_blank" class="social-card">
+                    <div class="social-icon"><i class="fab fa-instagram"></i></div>
+                    <h3>Instagram</h3>
+                    <p>@ibypasslpg</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Server Info Section -->
+        <section id="server" class="section">
+            <h1>Info Server</h1>
+            <p>Status server kami secara real-time untuk berbagai merek perangkat.</p>
+            
+            <table class="server-table">
+                <thead>
+                    <tr>
+                        <th>Server</th>
+                        <th>List</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                	<tr>
+                        <td>Server Global</td>
+                        <td>Unblock IMEI</td>
+                        <td><span class="status online">Online</span></td>
+                    </tr>
+                	<tr>
+                        <td>Server Global</td>
+                        <td>Bypass Wifi Only (Iphone Xs-16 PM)</td>
+                        <td><span class="status online">Online</span></td>
+                    </tr>
+                    <tr>
+                        <td>Server Global</td>
+                        <td>Bypass Cell (Iphone Xs-16 PM)</td>
+                        <td><span class="status offline">Offline</span></td>
+                    </tr>
+                    <tr>
+                        <td>Server Global</td>
+                        <td>Bypass Cell (Iphone 6-X)</td>
+                        <td><span class="status online">Online</span></td>
+                    </tr>
+                    <tr>
+                        <td>Server Global</td>
+                        <td>FRP Oppo</td>
+                        <td><span class="status offline">Offline</span></td>
+                    </tr>
+                    <tr>
+                        <td>Server Global</td>
+                        <td>FRP Infinix/Tecno/Itel</td>
+                        <td><span class="status online">Online</span></td>
+                    </tr>
+                    <tr>
+                        <td>Server Global</td>
+                        <td>FRP Xiaomi</td>
+                        <td><span class="status online">Online</span></td>
+                    </tr>
+                    <tr>
+                        <td>Server Global</td>
+                        <td>FRP Samsung</td>
+                        <td><span class="status online">Online</span></td>
+                    </tr>
+                    <tr>
+                        <td>Server Global</td>
+                        <td>FRP Vivo</td>
+                        <td><span class="status offline">Offline</span></td>
+                    </tr>
+                    <tr>
+                        <td>Server Global</td>
+                        <td>FRP Huawei</td>
+                        <td><span class="status online">Online</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 UNLX DEV. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+
+        document.addEventListener('mouseenter', () => {
+            cursor.style.opacity = '1';
+            cursorFollower.style.opacity = '1';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cursor.style.opacity = '0';
+            cursorFollower.style.opacity = '0';
+        });
+
+        // Cursor Hover Effects
+        const interactiveElements = document.querySelectorAll(
+            'a, button, .price-card, .social-card, input, textarea, select'
+        );
+        
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                cursorFollower.style.transform = 'translate(-50%, -50%) scale(0.5)';
+                cursorFollower.style.width = '30px';
+                cursorFollower.style.height = '30px';
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursorFollower.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursorFollower.style.width = '40px';
+                cursorFollower.style.height = '40px';
+            });
+        });
+
+        // Particles Animation
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = window.innerWidth < 768 ? 20 : 30;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random position
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.top = Math.random() * 100 + 'vh';
+            
+            // Random size
+            const size = Math.random() * 5 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            
+            // Random opacity
+            particle.style.opacity = Math.random() * 0.5 + 0.1;
+            
+            // Random animation
+            particle.style.animationDuration = Math.random() * 20 + 10 + 's';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            
+            particlesContainer.appendChild(particle);
+        }
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const mainNav = document.getElementById('mainNav');
+
+        menuToggle.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+            menuToggle.innerHTML = mainNav.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Close mobile menu if open
+                if (mainNav.classList.contains('active')) {
+                    mainNav.classList.remove('active');
+                    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+                
+                // Update active nav link
+                navLinks.forEach(navLink => navLink.classList.remove('active'));
+                link.classList.add('active');
+                
+                // Show corresponding section
+                const sectionId = link.getAttribute('data-section');
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === sectionId) {
+                        section.classList.add('active');
+                    }
+                });
+                
+                // Smooth scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // WhatsApp Order Function
+        const buyButtons = document.querySelectorAll('.buy-btn');
+        const whatsappNumber = '6283180892322'; // Replace with your WhatsApp number
+        
+        buyButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const tool = button.getAttribute('data-tool');
+                const duration = button.getAttribute('data-duration');
+                const price = button.getAttribute('data-price');
+                const action = button.textContent.includes('Beli') ? 'membeli' : 'menyewa';
+                
+                const message = `Halo, saya ingin ${action} ${tool} untuk ${duration} dengan harga Rp ${price}. Bagaimana cara pembayarannya?`;
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+                
+                window.open(whatsappUrl, '_blank');
+            });
+        });
+
+        // Scroll Animation
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.price-card, .social-card, .server-table, .tool-category');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (elementPosition < screenPosition) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        };
+
+        // Initialize elements for animation
+        document.querySelectorAll('.price-card, .social-card, .tool-category').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        });
+
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+
+        // Responsive adjustments
+        function handleResponsive() {
+            // Adjust particles count based on screen size
+            const currentParticles = document.querySelectorAll('.particle');
+            const desiredCount = window.innerWidth < 768 ? 20 : 30;
+            
+            if (currentParticles.length !== desiredCount) {
+                particlesContainer.innerHTML = '';
+                for (let i = 0; i < desiredCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    particle.style.top = Math.random() * 100 + 'vh';
+                    const size = Math.random() * 5 + 2;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.opacity = Math.random() * 0.5 + 0.1;
+                    particle.style.animationDuration = Math.random() * 20 + 10 + 's';
+                    particle.style.animationDelay = Math.random() * 5 + 's';
+                    particlesContainer.appendChild(particle);
+                }
+            }
+        }
+
+        window.addEventListener('resize', handleResponsive);
+        handleResponsive();
+    </script>
+</body>
+</html>
